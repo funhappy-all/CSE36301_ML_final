@@ -48,6 +48,7 @@ The report-ready outputs are:
 - `final_f1_vs_latency.png`
 - `final_f1_vs_logloss.png`
 - `all_models_f1_ranking.png`
+  - this ranking excludes the short 3-epoch and 6-epoch ablation rows because they are not useful in the final comparison
 
 ## Notes
 
@@ -56,3 +57,4 @@ The report-ready outputs are:
 - The best Traditional ML baseline is `Linear SVM (TF-IDF)`.
 - The main Sanghun result is the early-stopped Bi-Encoder.
 - The int8 Bi-Encoder is the compressed deployment variant.
+- The `all_models_f1_ranking.png` figure intentionally omits the 3-epoch and 6-epoch ablation rows.
