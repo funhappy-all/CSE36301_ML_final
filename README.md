@@ -57,4 +57,5 @@ The report-ready outputs are:
 - The best Traditional ML baseline is `Linear SVM (TF-IDF)`.
 - The main Sanghun result is the early-stopped Bi-Encoder.
 - The int8 Bi-Encoder is the compressed deployment variant.
+- The BERT Cross-Encoder baseline is included in the final comparison and comes from the external repository `Yuanzk7/CSE36301_ML_final`.
 - The `all_models_f1_ranking.png` figure intentionally omits the 3-epoch and 6-epoch ablation rows.

@@ -99,12 +99,17 @@ def pick_selected_models(df: pd.DataFrame) -> pd.DataFrame:
         if len(int8_bi):
             chosen.append(int8_bi.iloc[0])
 
+    bert = df[df["Model"] == "BERT Cross-Encoder"]
+    if len(bert):
+        chosen.append(bert.iloc[0])
+
     selected = pd.DataFrame(chosen).copy()
     order = [
         "Linear SVM (TF-IDF)",
         "Word2Vec + Siamese LSTM",
         "Bi-Encoder Early Stopping",
         "Embedding+Linear Int8 Bi-Encoder Early Stopping",
+        "BERT Cross-Encoder",
     ]
     selected["sort_key"] = pd.Categorical(selected["Model"], categories=order, ordered=True)
     selected = selected.sort_values("sort_key").drop(columns=["sort_key"])
@@ -119,6 +124,7 @@ def add_display_columns(df: pd.DataFrame) -> pd.DataFrame:
             "Word2Vec + Siamese LSTM": "Siamese\nLSTM",
             "Bi-Encoder Early Stopping": "Bi-Encoder\n(float)",
             "Embedding+Linear Int8 Bi-Encoder Early Stopping": "Bi-Encoder\n(int8)",
+            "BERT Cross-Encoder": "BERT\nCross-Encoder",
         }
     )
     return out
@@ -213,6 +219,7 @@ def save_scatter(
         "Taehun Kim": "#F58518",
         "Jun Park": "#4C78A8",
         "Sanghun Han": "#9E77ED",
+        "Yuchan": "#E45756",
     }
     sizes = None
     if size_col:
@@ -319,6 +326,10 @@ def main() -> None:
     all_models = add_display_parameter_count(all_models)
 
     build_summary_tables(selected, all_models)
+    (OUTPUT_DIR / "final_benchmark_summary.md").write_text(
+        (REPORT_DIR / "final_model_comparison.md").read_text(encoding="utf-8"),
+        encoding="utf-8",
+    )
 
     plot_df = selected.copy()
     save_barplot(plot_df, "Test Accuracy", "final_accuracy_comparison.png", "Final Model Accuracy Comparison", "Accuracy", "{:.3f}")
@@ -361,12 +372,29 @@ def main() -> None:
         size_col="Model Size MB",
     )
 
-    # A compact appendix view for the full benchmark table.
-    appendix = df.sort_values("Test F1", ascending=False).copy()
+    # A compact appendix view for the benchmark table, excluding short ablation
+    # runs because they do not add useful signal to the final ranking.
+    appendix = df[~df["Model"].str.contains("6 Epochs|^Bi-Encoder$", na=False)].sort_values("Test F1", ascending=False).copy()
+    appendix = appendix[~appendix["Model"].eq("Linear-Only Quantized Bi-Encoder")]
+    appendix = appendix[~appendix["Model"].eq("Embedding+Linear Int8 Bi-Encoder")]
+    appendix = add_display_parameter_count(appendix)
     appendix["Model Display"] = appendix["Model"].str.replace("Bi-Encoder", "Bi-Encoder", regex=False)
+    appendix_out = appendix[
+        [
+            "Model",
+            "Owner",
+            "Test Accuracy",
+            "Test F1",
+            "Test Log Loss",
+            "Inference ms/sample",
+            "Model Size MB",
+            "Parameter Count (Display)",
+        ]
+    ].rename(columns={"Parameter Count (Display)": "Parameter Count"})
+    appendix_out.to_csv(REPORT_DIR / "all_models_sorted_by_f1.csv", index=False)
     fig, ax = plt.subplots(figsize=(10.4, 6.8))
     ax.barh(appendix["Model"].iloc[::-1], appendix["Test F1"].iloc[::-1], color="#72B7B2")
-    ax.set_title("All Benchmark Models by Test F1")
+    ax.set_title("Benchmark Models by Test F1")
     ax.set_xlabel("Test F1")
     ax.set_ylabel("")
     for i, value in enumerate(appendix["Test F1"].iloc[::-1]):
