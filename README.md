@@ -11,6 +11,7 @@ It contains only the files needed to rerun the experiments and rebuild the final
   - `02_traditional_ml.ipynb`
   - `03_siamese_lstm_jun_data_only.ipynb`
   - `04_biencoder_quantization_sanghun.ipynb`
+  - `05_bert_crossencoder.ipynb`
 - `generate_final_benchmark_report.py`
 - `final_model_comparison.md`
 - `final_model_comparison.csv`
@@ -29,7 +30,9 @@ It contains only the files needed to rerun the experiments and rebuild the final
    - This notebook intentionally does not generate the final comparison plots.
 5. Run `notebooks/04_biencoder_quantization_sanghun.ipynb`.
    - Builds the Bi-Encoder, quantization, and benchmark outputs.
-6. Run `python generate_final_benchmark_report.py`.
+6. Run `notebooks/05_bert_crossencoder.ipynb`.
+   - Builds the BERT Cross-Encoder baseline and saves its result table.
+7. Run `python generate_final_benchmark_report.py`.
    - Rebuilds the final comparison table and final report figures in `outputs/final_report/`.
 
 ## Final report files
