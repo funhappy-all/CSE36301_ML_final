@@ -103,6 +103,10 @@ def pick_selected_models(df: pd.DataFrame) -> pd.DataFrame:
     if len(bert):
         chosen.append(bert.iloc[0])
 
+    bert_int8 = df[df["Model"] == "BERT Cross-Encoder Int8"]
+    if len(bert_int8):
+        chosen.append(bert_int8.iloc[0])
+
     selected = pd.DataFrame(chosen).copy()
     order = [
         "Linear SVM (TF-IDF)",
@@ -110,6 +114,7 @@ def pick_selected_models(df: pd.DataFrame) -> pd.DataFrame:
         "Bi-Encoder Early Stopping",
         "Embedding+Linear Int8 Bi-Encoder Early Stopping",
         "BERT Cross-Encoder",
+        "BERT Cross-Encoder Int8",
     ]
     selected["sort_key"] = pd.Categorical(selected["Model"], categories=order, ordered=True)
     selected = selected.sort_values("sort_key").drop(columns=["sort_key"])
@@ -125,6 +130,7 @@ def add_display_columns(df: pd.DataFrame) -> pd.DataFrame:
             "Bi-Encoder Early Stopping": "Bi-Encoder\n(float)",
             "Embedding+Linear Int8 Bi-Encoder Early Stopping": "Bi-Encoder\n(int8)",
             "BERT Cross-Encoder": "BERT\nCross-Encoder",
+            "BERT Cross-Encoder Int8": "BERT\nCross-Enc int8",
         }
     )
     return out
