@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import shutil
 from pathlib import Path
 
 import matplotlib
@@ -33,7 +32,6 @@ def save_both(fig, filename: str, subdir: str | None = None) -> None:
         out = OUTPUT_DIR / filename
     out.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(out, bbox_inches="tight")
-    fig.savefig(ROOT / filename, bbox_inches="tight")
     plt.close(fig)
 
 
@@ -225,32 +223,11 @@ def generate_biencoder_graphs() -> None:
         save_both(fig, "early_stopping_validation_curve.png")
 
 
-def copy_final_report_graphs() -> None:
-    mapping = [
-        "all_models_f1_ranking.png",
-        "final_accuracy_comparison.png",
-        "final_f1_comparison.png",
-        "final_f1_vs_latency.png",
-        "final_f1_vs_logloss.png",
-        "final_f1_vs_size.png",
-        "final_inference_speed_comparison.png",
-        "final_logloss_comparison.png",
-        "final_model_size_comparison.png",
-        "final_parameter_count_comparison.png",
-    ]
-    for name in mapping:
-        src = FINAL_REPORT_DIR / name
-        if src.exists():
-            shutil.copy2(src, ROOT / name)
-            shutil.copy2(src, OUTPUT_DIR / name)
-
-
 def main() -> None:
     generate_eda()
     generate_traditional_ml_graphs()
     generate_tradeoff_graphs()
     generate_biencoder_graphs()
-    copy_final_report_graphs()
     print("Regenerated graphs.")
 
 
